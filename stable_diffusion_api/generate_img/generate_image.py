@@ -4,6 +4,7 @@ import requests
 from PIL import Image
 from io import BytesIO
 import base64
+import time 
 
 
 def pil_to_base64(img):
@@ -34,13 +35,13 @@ def generate_image(ip_address: str, type_generate: str, data):
             
     url_set_model = f'http://127.0.0.1:786{port.port_number}/sdapi/v1/options'
     
-    if image_request.type_generate != type_generate and type_generate == 'txt2img':
+    if type_generate == 'txt2img':
         option_payload = {
         "sd_model_checkpoint": "mj_v1.safetensors [514f5cc25b]",
         "CLIP_stop_at_last_layers": 2
         }
         response = requests.post(url=url_set_model, json=option_payload)
-    elif image_request.type_generate != type_generate and  type_generate == 'img2img':
+    elif type_generate == 'img2img':
         option_payload = {
         "sd_model_checkpoint": "Deliberate_v4-inpainting.safetensors [aadce23ddd]",
         "CLIP_stop_at_last_layers": 2
@@ -67,6 +68,7 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request.status = 'failed'        
         image_request.erorrs = f'Error: {str(e)}'
         image_request.save()
+        time.sleep(60)      
     finally:
         port.status_is_busy = False   
         port.save()

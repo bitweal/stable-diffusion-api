@@ -10,7 +10,8 @@ class Text2ImageView(views.APIView):
         negative_prompt = request.data.get('negative_prompt')
         width = request.data.get('width')
         height = request.data.get('height')
-        ip_address = request.META.get('REMOTE_ADDR')
+        ip_address = request.data.get('ip_address')
+        #ip_address = request.META.get('REMOTE_ADDR')
         
         type_generate = 'txt2img'
         existing_request = ImageRequest.objects.filter(ip_address=ip_address, status__in=['queued', 'processing', 'completed', 'ready', 'failed']).first()      
@@ -51,7 +52,8 @@ class Image2ImageView(views.APIView):
         path_to_mask = request.data.get('path_to_mask')
         inpainting_mask_invert = request.data.get('inpainting_mask_invert')
         denoising_strength = request.data.get('denoising_strength')
-        ip_address = request.META.get('REMOTE_ADDR')
+        ip_address = request.data.get('ip_address')
+        #ip_address = request.META.get('REMOTE_ADDR')
         
         type_generate = 'img2img'
         existing_request = ImageRequest.objects.filter(ip_address=ip_address, status__in=['queued', 'processing', 'completed', 'ready', 'failed']).first()      
@@ -92,7 +94,8 @@ class Image2ImageView(views.APIView):
 
 class StatusView(views.APIView):
     def post(self, request, *args, **kwargs):
-        ip_address = request.META.get('REMOTE_ADDR')
+        ip_address = request.data.get('ip_address')
+        #ip_address = request.META.get('REMOTE_ADDR')
 
         existing_request = ImageRequest.objects.filter(ip_address=ip_address, status__in=['queued', 'processing', 'completed', 'ready', 'failed']).first()
 
