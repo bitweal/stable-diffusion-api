@@ -24,6 +24,6 @@ class ImageRequest(models.Model):
     erorrs = models.TextField()
     
 
-class PortQueue(models.Model):
-    port_number = models.IntegerField(unique=True)
+class InterfaceQueue(models.Model):
+    interface = models.IntegerField(unique=True)
     status_is_busy = models.BooleanField(default=False)

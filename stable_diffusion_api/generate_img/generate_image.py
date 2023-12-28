@@ -1,4 +1,4 @@
-from .models import ImageRequest, PortQueue
+from .models import ImageRequest, InterfaceQueue
 from background_task import background
 import requests
 from PIL import Image
@@ -24,16 +24,16 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request.save()
         return   
     try:     
-        port = PortQueue.objects.filter(status_is_busy=False).first()
-    except PortQueue.DoesNotExist:
+        port = InterfaceQueue.objects.filter(status_is_busy=False).first()
+    except InterfaceQueue.DoesNotExist:
         image_request.status = 'failed'
         image_request.errors = 'No such port'
         image_request.save()  
         return
     port.status_is_busy = True
-    port.save
+    port.save()
             
-    url_set_model = f'http://127.0.0.1:786{port.port_number}/sdapi/v1/options'
+    url_set_model = f'http://127.0.0.1:78{port.port_number}/sdapi/v1/options'
     
     if type_generate == 'txt2img':
         option_payload = {
@@ -48,7 +48,7 @@ def generate_image(ip_address: str, type_generate: str, data):
         }
         response = requests.post(url=url_set_model, json=option_payload)  
 
-    url = f'http://127.0.0.1:786{port.port_number}/sdapi/v1/{type_generate}'
+    url = f'http://127.0.0.1:78{port.port_number}/sdapi/v1/{type_generate}'
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json',

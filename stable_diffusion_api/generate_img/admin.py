@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ImageRequest, PortQueue
+from .models import ImageRequest, InterfaceQueue
 
 @admin.register(ImageRequest)
 class ImageRequestAdmin(admin.ModelAdmin):
@@ -17,6 +17,6 @@ class ImageRequestAdmin(admin.ModelAdmin):
                     'image_data', 
                     'erorrs')
     
-@admin.register(PortQueue)
-class PortQueueAdmin(admin.ModelAdmin):
-    list_display = ('port_number', 'status_is_busy')
+@admin.register(InterfaceQueue)
+class InterfaceQueueAdmin(admin.ModelAdmin):
+    list_display = ('interface', 'status_is_busy')
