@@ -24,16 +24,16 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request.save()
         return   
     try:     
-        port = InterfaceQueue.objects.filter(status_is_busy=False).first()
+        interface = InterfaceQueue.objects.filter(status_is_busy=False).first()
     except InterfaceQueue.DoesNotExist:
         image_request.status = 'failed'
-        image_request.errors = 'No such port'
+        image_request.errors = 'No such interface'
         image_request.save()  
         return
-    port.status_is_busy = True
-    port.save()
+    interface.status_is_busy = True
+    interface.save()
             
-    url_set_model = f'http://127.0.0.1:78{port.port_number}/sdapi/v1/options'
+    url_set_model = f'http://{interface.interface}/sdapi/v1/options'
     
     if type_generate == 'txt2img':
         option_payload = {
@@ -48,7 +48,7 @@ def generate_image(ip_address: str, type_generate: str, data):
         }
         response = requests.post(url=url_set_model, json=option_payload)  
 
-    url = f'http://127.0.0.1:78{port.port_number}/sdapi/v1/{type_generate}'
+    url = f'http://{interface.interface}/sdapi/v1/{type_generate}'
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json',
@@ -70,8 +70,8 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request.save()
         time.sleep(60)      
     finally:
-        port.status_is_busy = False   
-        port.save()
+        interface.status_is_busy = False   
+        interface.save()
         image_request.save()   
       
         
