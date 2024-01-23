@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class ImageRequest(models.Model):
     STATUS_CHOICES = [
         ('queued', 'Queued'),

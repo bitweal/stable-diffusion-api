@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import ImageRequest, InterfaceQueue, ModelVersions
 
+
 @admin.register(ImageRequest)
 class ImageRequestAdmin(admin.ModelAdmin):
     list_display = ('model_name',
