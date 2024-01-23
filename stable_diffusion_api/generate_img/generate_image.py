@@ -20,20 +20,20 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request = ImageRequest.objects.get(ip_address=ip_address, status='processing')
     except ImageRequest.DoesNotExist:
         image_request.status = 'failed'        
-        image_request.erorrs = f'ImageRequest DoesNotExist'
+        image_request.errors  = f'ImageRequest DoesNotExist'
         image_request.save()
         return   
     try:     
-        port = InterfaceQueue.objects.filter(status_is_busy=False).first()
+        interface = InterfaceQueue.objects.filter(status_is_busy=False).first()
     except InterfaceQueue.DoesNotExist:
         image_request.status = 'failed'
-        image_request.errors = 'No such port'
+        image_request.errors = 'No such interface'
         image_request.save()  
         return
-    port.status_is_busy = True
-    port.save()
+    interface.status_is_busy = True
+    interface.save()
             
-    url_set_model = f'http://127.0.0.1:78{port.port_number}/sdapi/v1/options'
+    url_set_model = f'{interface.interface}/sdapi/v1/options'
     
     if type_generate == 'txt2img':
         option_payload = {
@@ -48,7 +48,7 @@ def generate_image(ip_address: str, type_generate: str, data):
         }
         response = requests.post(url=url_set_model, json=option_payload)  
 
-    url = f'http://127.0.0.1:78{port.port_number}/sdapi/v1/{type_generate}'
+    url = f'{interface.interface}/sdapi/v1/{type_generate}'
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json',
@@ -63,15 +63,15 @@ def generate_image(ip_address: str, type_generate: str, data):
             image_request.image_data = response.json()['images'][0]
         else:
             image_request.status = 'failed'  
-            image_request.erorrs = response.json()                
+            image_request.errors  = response.json()                
     except Exception as e:
         image_request.status = 'failed'        
-        image_request.erorrs = f'Error: {str(e)}'
+        image_request.errors  = f'Error: {str(e)}'
         image_request.save()
         time.sleep(60)      
     finally:
-        port.status_is_busy = False   
-        port.save()
+        interface.status_is_busy = False   
+        interface.save()
         image_request.save()   
       
         
@@ -92,13 +92,17 @@ def put_in_queue(ip_address):
     except ImageRequest.DoesNotExist:
         image_request = ImageRequest.objects.get(ip_address=ip_address)
         image_request.status = 'failed'        
-        image_request.erorrs = f'ImageRequest DoesNotExist'
+        image_request.errors  = f'ImageRequest DoesNotExist'
         image_request.save()
         return
     
     image_request.status = 'processing'
     image_request.save()
     
+    if negative_prompt == '':
+        negative_prompt = '[deformed | disfigured], poorly drawn, [bad : wrong] anatomy,\
+       [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry'
+       
     try:
         if type_generate == 'txt2img':
             data_txt2img = {
@@ -107,7 +111,7 @@ def put_in_queue(ip_address):
             "seed": -1,
             "sampler_name": "DPM++ 2M Karras",
             "batch_size": 1,
-            "steps": 30,
+            "steps": 25,
             "cfg_scale": 7,
             "width": width,
             "height": height,
@@ -141,7 +145,7 @@ def put_in_queue(ip_address):
             "sampler_name": "DPM++ 2M Karras",
             "denoising_strength": denoising_strength,
             "batch_size": 1,
-            "steps": 40,
+            "steps": 35,
             "cfg_scale": 7,
             "width": width,
             "height": height,
@@ -162,6 +166,6 @@ def put_in_queue(ip_address):
             generate_image(ip_address, type_generate, data_img2img)
     except Exception as e:
         image_request.status = 'failed'        
-        image_request.erorrs = f'Error: {e}'
+        image_request.errors  = f'Error: {e}'
         image_request.save()
         return

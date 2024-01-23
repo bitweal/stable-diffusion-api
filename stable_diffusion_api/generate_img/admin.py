@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ImageRequest, InterfaceQueue
+from .models import ImageRequest, InterfaceQueue, ModelVersions
 
 @admin.register(ImageRequest)
 class ImageRequestAdmin(admin.ModelAdmin):
@@ -15,8 +15,14 @@ class ImageRequestAdmin(admin.ModelAdmin):
                     'denoising_strength', 
                     'ip_address', 
                     'image_data', 
-                    'erorrs')
+                    'errors')
     
+
 @admin.register(InterfaceQueue)
 class InterfaceQueueAdmin(admin.ModelAdmin):
     list_display = ('interface', 'status_is_busy')
+   
+    
+@admin.register(ModelVersions)
+class ModelVersionsAdmin(admin.ModelAdmin):
+    list_display = ('models',)

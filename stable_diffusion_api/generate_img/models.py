@@ -21,9 +21,13 @@ class ImageRequest(models.Model):
     denoising_strength = models.FloatField(default=0.5)
     ip_address = models.GenericIPAddressField()
     image_data = models.TextField(blank=True, null=True)
-    erorrs = models.TextField()
+    errors  = models.TextField()
     
 
 class InterfaceQueue(models.Model):
-    interface = models.IntegerField(unique=True)
+    interface = models.URLField(unique=True)
     status_is_busy = models.BooleanField(default=False)
+    
+
+class ModelVersions(models.Model):
+    models = models.TextField()
