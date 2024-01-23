@@ -8,7 +8,7 @@ class ImageRequest(models.Model):
         ('ready', 'Ready'),
         ('failed', 'Failed'),
     ]
-
+    model_name = models.TextField()
     type_generate = models.TextField(max_length=10)
     prompt = models.TextField()
     negative_prompt = models.TextField(default="")
@@ -30,4 +30,6 @@ class InterfaceQueue(models.Model):
     
 
 class ModelVersions(models.Model):
-    models = models.TextField()
+    model_name = models.TextField()
+    model_full_name = models.TextField()
+    

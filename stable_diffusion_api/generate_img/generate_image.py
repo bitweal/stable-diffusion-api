@@ -1,4 +1,4 @@
-from .models import ImageRequest, InterfaceQueue
+from .models import ImageRequest, InterfaceQueue, ModelVersions
 from background_task import background
 import requests
 from PIL import Image
@@ -36,8 +36,9 @@ def generate_image(ip_address: str, type_generate: str, data):
     url_set_model = f'{interface.interface}/sdapi/v1/options'
     
     if type_generate == 'txt2img':
+        model = ModelVersions.objects.get(model_name=image_request.model_name).model_full_name
         option_payload = {
-        "sd_model_checkpoint": "mj_v1.safetensors [514f5cc25b]",
+        "sd_model_checkpoint": model,
         "CLIP_stop_at_last_layers": 2
         }
         response = requests.post(url=url_set_model, json=option_payload)

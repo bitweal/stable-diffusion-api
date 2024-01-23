@@ -3,7 +3,8 @@ from .models import ImageRequest, InterfaceQueue, ModelVersions
 
 @admin.register(ImageRequest)
 class ImageRequestAdmin(admin.ModelAdmin):
-    list_display = ('type_generate',
+    list_display = ('model_name',
+                    'type_generate',
                     'prompt', 
                     'negative_prompt', 
                     'width', 
@@ -25,4 +26,4 @@ class InterfaceQueueAdmin(admin.ModelAdmin):
     
 @admin.register(ModelVersions)
 class ModelVersionsAdmin(admin.ModelAdmin):
-    list_display = ('models',)
+    list_display = ('model_name','model_full_name')

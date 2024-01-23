@@ -6,6 +6,7 @@ from .generate_image import put_in_queue
 
 class Text2ImageView(views.APIView):
     def post(self, request, *args, **kwargs):
+        model_name = request.data.get('model_name')
         prompt = request.data.get('prompt')
         negative_prompt = request.data.get('negative_prompt')
         width = request.data.get('width')
@@ -17,6 +18,7 @@ class Text2ImageView(views.APIView):
         existing_request = ImageRequest.objects.filter(ip_address=ip_address, status__in=['queued', 'processing', 'completed', 'ready', 'failed']).first()      
         if existing_request:
             if existing_request.status == 'ready':
+                    existing_request.model_name = model_name    
                     existing_request.type_generate=type_generate    
                     existing_request.prompt = prompt
                     existing_request.negative_prompt = negative_prompt
@@ -30,6 +32,7 @@ class Text2ImageView(views.APIView):
                 return Response({'status': f'{existing_request.status}'})
         else:
             image_request = ImageRequest.objects.create(
+            model_name=model_name,
             type_generate=type_generate,
             prompt=prompt, 
             negative_prompt=negative_prompt,
@@ -44,6 +47,7 @@ class Text2ImageView(views.APIView):
 
 class Image2ImageView(views.APIView):
     def post(self, request, *args, **kwargs):
+        model_name = request.data.get('model_name')
         prompt = request.data.get('prompt')
         negative_prompt = request.data.get('negative_prompt')
         width = request.data.get('width')
@@ -59,6 +63,7 @@ class Image2ImageView(views.APIView):
         existing_request = ImageRequest.objects.filter(ip_address=ip_address, status__in=['queued', 'processing', 'completed', 'ready', 'failed']).first()      
         if existing_request:
             if existing_request.status == 'ready':
+                    existing_request.model_name = model_name    
                     existing_request.type_generate=type_generate    
                     existing_request.prompt = prompt
                     existing_request.negative_prompt = negative_prompt
@@ -76,6 +81,7 @@ class Image2ImageView(views.APIView):
                 return Response({'status': f'{existing_request.status}'})
         else:
             image_request = ImageRequest.objects.create(
+            model_name=model_name,
             type_generate=type_generate,
             prompt=prompt, 
             negative_prompt=negative_prompt,
