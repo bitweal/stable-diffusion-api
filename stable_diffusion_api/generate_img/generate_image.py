@@ -20,9 +20,10 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request = ImageRequest.objects.get(ip_address=ip_address, status='processing')
     except ImageRequest.DoesNotExist:
         image_request.status = 'failed'        
-        image_request.errors  = f'ImageRequest DoesNotExist'
+        image_request.errors = f'ImageRequest DoesNotExist'
         image_request.save()
         return   
+    
     try:     
         interface = InterfaceQueue.objects.filter(status_is_busy=False).first()
     except InterfaceQueue.DoesNotExist:
@@ -30,24 +31,18 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request.errors = 'No such interface'
         image_request.save()  
         return
+    
     interface.status_is_busy = True
     interface.save()
             
     url_set_model = f'{interface.interface}/sdapi/v1/options'
     
-    if type_generate == 'txt2img':
-        model = ModelVersions.objects.get(model_name=image_request.model_name).model_full_name
-        option_payload = {
-        "sd_model_checkpoint": model,
-        "CLIP_stop_at_last_layers": 2
-        }
-        response = requests.post(url=url_set_model, json=option_payload)
-    elif type_generate == 'img2img':
-        option_payload = {
-        "sd_model_checkpoint": "Deliberate_v4-inpainting.safetensors [aadce23ddd]",
-        "CLIP_stop_at_last_layers": 2
-        }
-        response = requests.post(url=url_set_model, json=option_payload)  
+    model = ModelVersions.objects.get(model_name=image_request.model_name).model_full_name
+    option_payload = {
+    "sd_model_checkpoint": model,
+    "CLIP_stop_at_last_layers": 2
+    }
+    response = requests.post(url=url_set_model, json=option_payload)
 
     url = f'{interface.interface}/sdapi/v1/{type_generate}'
     headers = {
@@ -64,10 +59,10 @@ def generate_image(ip_address: str, type_generate: str, data):
             image_request.image_data = response.json()['images'][0]
         else:
             image_request.status = 'failed'  
-            image_request.errors  = response.json()                
+            image_request.errors = response.json()                
     except Exception as e:
         image_request.status = 'failed'        
-        image_request.errors  = f'Error: {str(e)}'
+        image_request.errors = f'Error: {str(e)}'
         image_request.save()
         time.sleep(60)      
     finally:
@@ -93,7 +88,7 @@ def put_in_queue(ip_address):
     except ImageRequest.DoesNotExist:
         image_request = ImageRequest.objects.get(ip_address=ip_address)
         image_request.status = 'failed'        
-        image_request.errors  = f'ImageRequest DoesNotExist'
+        image_request.errors = f'ImageRequest DoesNotExist'
         image_request.save()
         return
     
@@ -167,6 +162,6 @@ def put_in_queue(ip_address):
             generate_image(ip_address, type_generate, data_img2img)
     except Exception as e:
         image_request.status = 'failed'        
-        image_request.errors  = f'Error: {e}'
+        image_request.errors = f'Error: {e}'
         image_request.save()
         return

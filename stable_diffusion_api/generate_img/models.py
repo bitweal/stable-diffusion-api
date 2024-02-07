@@ -1,3 +1,4 @@
+from pyexpat import model
 from django.db import models
 
 
@@ -29,6 +30,11 @@ class InterfaceQueue(models.Model):
     interface = models.URLField(unique=True)
     status_is_busy = models.BooleanField(default=False)
     
+
+class Statistics(models.Model):
+    month = models.CharField(max_length=7, unique=True)
+    month_requests = models.IntegerField(default=0)
+
 
 class ModelVersions(models.Model):
     model_name = models.TextField()
