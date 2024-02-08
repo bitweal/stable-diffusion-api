@@ -32,25 +32,25 @@ def generate_image(ip_address: str, type_generate: str, data):
         image_request.save()  
         return
     
-    interface.status_is_busy = True
-    interface.save()
+    try:
+        interface.status_is_busy = True
+        interface.save()
             
-    url_set_model = f'{interface.interface}/sdapi/v1/options'
+        url_set_model = f'{interface.interface}/sdapi/v1/options'
     
-    model = ModelVersions.objects.get(model_name=image_request.model_name).model_full_name
-    option_payload = {
-    "sd_model_checkpoint": model,
-    "CLIP_stop_at_last_layers": 2
-    }
-    response = requests.post(url=url_set_model, json=option_payload)
+        model = ModelVersions.objects.get(model_name=image_request.model_name).model_full_name
+        option_payload = {
+        "sd_model_checkpoint": model,
+        "CLIP_stop_at_last_layers": 2
+        }
+        response = requests.post(url=url_set_model, json=option_payload)
 
-    url = f'{interface.interface}/sdapi/v1/{type_generate}'
-    headers = {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-    } 
-     
-    try:      
+        url = f'{interface.interface}/sdapi/v1/{type_generate}'
+        headers = {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        } 
+        
         response = requests.post(url=url, headers=headers, json=data)
         status = response.status_code        
         
