@@ -400,6 +400,5 @@ FodyWeavers.xsd
 env
 test.py
 test_2.py
-/stable_diffusion_api/db.sqlite3
 /stable_diffusion_api/config.py
 desktop.ini
