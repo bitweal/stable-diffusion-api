@@ -19,9 +19,6 @@ def generate_image(ip_address: str, type_generate: str, data):
     try:
         image_request = ImageRequest.objects.get(ip_address=ip_address, status='processing')
     except ImageRequest.DoesNotExist:
-        image_request.status = 'failed'        
-        image_request.errors = f'ImageRequest DoesNotExist'
-        image_request.save()
         return   
     
     try:     
@@ -40,10 +37,10 @@ def generate_image(ip_address: str, type_generate: str, data):
     
         model = ModelVersions.objects.get(model_name=image_request.model_name).model_full_name
         option_payload = {
-        "sd_model_checkpoint": model,
-        "CLIP_stop_at_last_layers": 2
+            "sd_model_checkpoint": model,
+            "CLIP_stop_at_last_layers": 2
         }
-        response = requests.post(url=url_set_model, json=option_payload)
+        requests.post(url=url_set_model, json=option_payload)
 
         url = f'{interface.interface}/sdapi/v1/{type_generate}'
         headers = {
@@ -102,62 +99,62 @@ def put_in_queue(ip_address):
     try:
         if type_generate == 'txt2img':
             data_txt2img = {
-            "prompt": prompt,
-            "negative_prompt": negative_prompt,
-            "seed": -1,
-            "sampler_name": "DPM++ 2M Karras",
-            "batch_size": 1,
-            "steps": 25,
-            "cfg_scale": 7,
-            "width": width,
-            "height": height,
-            "restore_faces": False,
-            "tiling": False,
-            "send_images": True,
-            "save_images": True,
-            "alwayson_scripts": {
-                "ADetailer": {
-                  "args": [
-                    {
-                      "ad_model": "face_yolov8s.pt"
+                "prompt": prompt,
+                "negative_prompt": negative_prompt,
+                "seed": -1,
+                "sampler_name": "DPM++ 2M Karras",
+                "batch_size": 1,
+                "steps": 25,
+                "cfg_scale": 7,
+                "width": width,
+                "height": height,
+                "restore_faces": False,
+                "tiling": False,
+                "send_images": True,
+                "save_images": True,
+                "alwayson_scripts": {
+                    "ADetailer": {
+                      "args": [
+                        {
+                          "ad_model": "face_yolov8s.pt"
+                        }
+                      ]
                     }
-                  ]
-                }   
-            }
+                }
             }
             generate_image(ip_address, type_generate, data_txt2img)       
         elif type_generate == 'img2img':
             data_img2img = {
-            "prompt": prompt,
-            "negative_prompt": negative_prompt,
-            "init_images": [pil_to_base64(path_to_img)],
-            "mask": pil_to_base64(path_to_mask),
-            "inpainting_mask_invert": inpainting_mask_invert,
-            "inpainting_fill": 1,
-            "inpaint_full_res": 1,
-            "inpaint_full_res_padding": 32,
-            "include_init_images": True,
-            "seed": -1,
-            "sampler_name": "DPM++ 2M Karras",
-            "denoising_strength": denoising_strength,
-            "batch_size": 1,
-            "steps": 35,
-            "cfg_scale": 7,
-            "width": width,
-            "height": height,
-            "restore_faces": False,
-            "tiling": False,
-            "send_images": True,
-            "save_images": True,
-            "alwayson_scripts": {
-                "ADetailer": {
-                  "args": [
-                    {
-                      "ad_model": "face_yolov8s.pt"
+                "prompt": prompt,
+                "negative_prompt": negative_prompt,
+                "init_images": [pil_to_base64(path_to_img)],
+                "mask": pil_to_base64(path_to_mask),
+                "inpainting_mask_invert": inpainting_mask_invert,
+                "inpainting_fill": 1,
+                "inpaint_full_res": 1,
+                "inpaint_full_res_padding": 32,
+                "include_init_images": True,
+                "seed": -1,
+                "sampler_name": "DPM++ 2M Karras",
+                "denoising_strength": denoising_strength,
+                "batch_size": 1,
+                "steps": 35,
+                "cfg_scale": 7,
+                "width": width,
+                "height": height,
+                "restore_faces": False,
+                "tiling": False,
+                "send_images": True,
+                "save_images": True,
+                "alwayson_scripts": {
+                    "ADetailer": {
+                      "args": [
+                        {
+                          "ad_model": "face_yolov8s.pt"
+                        }
+                      ]
                     }
-                  ]
-                }   
-            }
+                }
             }
             generate_image(ip_address, type_generate, data_img2img)
     except Exception as e:
